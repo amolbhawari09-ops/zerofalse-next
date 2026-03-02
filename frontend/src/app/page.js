@@ -1,485 +1,541 @@
-import { Navbar } from "@/components/Navbar";
-import { CodePreview } from "@/components/CodePreview";
-import { StatsCounter } from "@/components/StatsCounter";
-import { FeatureCard } from "@/components/FeatureCard";
-import { PricingCard } from "@/components/PricingCard";
-import { Footer } from "@/components/Footer";
+'use client'
+
+import { motion } from 'framer-motion'
 import { 
   Shield, 
+  Code2, 
   Zap, 
-  Brain, 
-  Fingerprint, 
-  ArrowRight,
-  AlertTriangle,
-  CheckCircle,
-  XCircle
-} from "lucide-react";
+  CheckCircle2, 
+  ArrowRight, 
+  Play,
+  Github,
+  Twitter,
+  Linkedin,
+  Menu,
+  X
+} from 'lucide-react'
+import { useState } from 'react'
+import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
 
-const features = [
-  {
-    number: "01",
-    title: "Real-Time Guardrails",
-    description: "Zerofalse joins as a security teammate in VS Code, Cursor, and Claude Code. Blocks vulnerabilities BEFORE AI suggests them — not after.",
-    features: [
-      "IDE extension for instant feedback",
-      "MCP server for Claude Code integration",
-      "Blocks dangerous patterns in milliseconds"
-    ],
-    visual: (
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex flex-col items-center gap-2 p-4 bg-gray-800 rounded-lg">
-          <span className="text-2xl">🤖</span>
-          <span className="text-xs text-gray-400">AI Suggests</span>
-        </div>
-        <ArrowRight className="w-6 h-6 text-gray-600" />
-        <div className="flex flex-col items-center gap-2 p-4 bg-green-500/20 border border-green-500/50 rounded-lg">
-          <Shield className="w-6 h-6 text-green-400" />
-          <span className="text-xs text-green-400">Zerofalse Checks</span>
-        </div>
-        <ArrowRight className="w-6 h-6 text-gray-600" />
-        <div className="flex flex-col items-center gap-2 p-4 bg-gray-800 rounded-lg">
-          <CheckCircle className="w-6 h-6 text-green-400" />
-          <span className="text-xs text-gray-400">Safe / Blocked</span>
-        </div>
-      </div>
-    )
-  },
-  {
-    number: "02",
-    title: '"Looks Clean" Detection ⭐',
-    description: "AI code looks 90% correct. That's the dangerous part. We find the 10% that looks right but kills you in production.",
-    features: [
-      "SQL injections that look parameterized",
-      "Auth that looks solid but bypasses 2FA",
-      "Dependencies that don't exist (hallucinations)"
-    ],
-    visual: (
-      <div className="space-y-4">
-        <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
-          <div className="flex items-center gap-2 mb-2">
-            <XCircle className="w-4 h-4 text-red-400" />
-            <span className="text-xs font-medium text-red-400">Looks Clean</span>
-          </div>
-          <code className="text-sm text-red-300">
-  {`const query = \`SELECT * FROM users WHERE id = \${id}\``}
-</code>
-        </div>
-        <div className="flex justify-center">
-          <ArrowRight className="w-6 h-6 text-gray-600 rotate-90" />
-        </div>
-        <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
-          <div className="flex items-center gap-2 mb-2">
-            <CheckCircle className="w-4 h-4 text-green-400" />
-            <span className="text-xs font-medium text-green-400">Actually Safe</span>
-          </div>
-          <code className="text-sm text-green-300">
-  {`db.query('SELECT * FROM users WHERE id = ?', [id])`}
-</code>
-        </div>
-      </div>
-    ),
-    reverse: true
-  },
-  {
-    number: "03",
-    title: "AI Model Fingerprinting",
-    description: "Know which AI (GPT-5.3, Claude 4.6, Copilot) wrote your code and what mistakes it typically makes.",
-    features: [
-      "GPT-5.3: 75% secure, overcomplicates auth",
-      "Claude 4.6: 90% secure, best with prompts",
-      "Copilot: 70% secure, 40% higher secret leakage"
-    ],
-    visual: (
-      <div className="grid grid-cols-3 gap-4">
-        <div className="p-4 bg-gray-800 rounded-lg text-center">
-          <div className="text-xs text-gray-400 mb-1">GPT-5.3</div>
-          <div className="text-2xl font-bold text-yellow-400">75%</div>
-          <div className="text-xs text-gray-500">Secure</div>
-        </div>
-        <div className="p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-center relative">
-          <div className="absolute -top-2 left-1/2 -translate-x-1/2 text-xs bg-green-500 text-black px-2 rounded-full">Best</div>
-          <div className="text-xs text-gray-400 mb-1">Claude 4.6</div>
-          <div className="text-2xl font-bold text-green-400">90%</div>
-          <div className="text-xs text-gray-500">Secure</div>
-        </div>
-        <div className="p-4 bg-gray-800 rounded-lg text-center">
-          <div className="text-xs text-gray-400 mb-1">Copilot</div>
-          <div className="text-2xl font-bold text-red-400">70%</div>
-          <div className="text-xs text-gray-500">Secure</div>
-        </div>
-      </div>
-    )
+const fadeInUp = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.5 }
+}
+
+const staggerContainer = {
+  animate: {
+    transition: {
+      staggerChildren: 0.1
+    }
   }
-];
+}
 
-const pricingPlans = [
-  {
-    name: "Starter",
-    price: "49",
-    description: "For small teams getting started with AI coding",
-    features: [
-      "Up to 5 developers",
-      "50 scans/day",
-      "Basic vulnerability detection",
-      "Community support"
-    ]
-  },
-  {
-    name: "Pro",
-    price: "199",
-    description: "For growing teams with AI-native workflows",
-    features: [
-      "Up to 20 developers",
-      "Unlimited scans",
-      '"Looks clean" detection',
-      "Model fingerprinting",
-      "Slack integration",
-      "Priority support"
-    ],
-    popular: true
-  },
-  {
-    name: "Enterprise",
-    price: "999",
-    description: "For organizations with advanced security needs",
-    features: [
-      "Up to 200 developers",
-      "SSO & SAML",
-      "Custom rules",
-      "Dedicated support",
-      "SLA guarantee",
-      "On-premise option"
-    ]
-  }
-];
+export default function Home() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-export default function LandingPage() {
+  const features = [
+    {
+      icon: Shield,
+      title: "Real-Time Guardrails",
+      description: "Joins as a security teammate in VS Code, Cursor, and Claude Code. Blocks vulnerabilities before AI suggests them.",
+      highlights: ["IDE extension for instant feedback", "MCP server for Claude Code", "Blocks dangerous patterns in milliseconds"]
+    },
+    {
+      icon: Code2,
+      title: "Semantic Analysis",
+      description: "AI code looks 90% correct. That's the dangerous part. We find the 10% that looks right but kills you in production.",
+      highlights: ["SQL injections that look parameterized", "Auth that looks solid but bypasses 2FA", "Dependencies that don't exist"]
+    },
+    {
+      icon: Zap,
+      title: "Model Fingerprinting",
+      description: "Know which AI wrote your code and what mistakes it typically makes. Predict vulnerabilities before they happen.",
+      highlights: ["GPT-4: Overcomplicates auth patterns", "Claude: Best with prompt injections", "Copilot: Higher secret leakage rate"]
+    }
+  ]
+
+  const stats = [
+    { value: "45%", label: "Of AI code has vulnerabilities", source: "Veracade 2025" },
+    { value: "1 in 5", label: "Orgs breached by AI code", source: "Aikido Security 2026" },
+    { value: "3x", label: "More vulnerabilities vs human code", source: "Security Research" }
+  ]
+
+  const pricingPlans = [
+    {
+      name: "Starter",
+      price: "$49",
+      period: "/month",
+      description: "For small teams getting started with AI coding",
+      features: [
+        "Up to 5 developers",
+        "500 scans/day",
+        "Basic vulnerability detection",
+        "Community support",
+        "VS Code extension"
+      ],
+      cta: "Start Free Trial",
+      popular: false
+    },
+    {
+      name: "Professional",
+      price: "$199",
+      period: "/month",
+      description: "For growing teams with AI-native workflows",
+      features: [
+        "Up to 25 developers",
+        "Unlimited scans",
+        "Semantic vulnerability analysis",
+        "Model fingerprinting",
+        "Slack & Discord integration",
+        "Priority support",
+        "SSO ready"
+      ],
+      cta: "Start Free Trial",
+      popular: true
+    },
+    {
+      name: "Enterprise",
+      price: "Custom",
+      period: "",
+      description: "For organizations with advanced security needs",
+      features: [
+        "Unlimited developers",
+        "Custom deployment options",
+        "Advanced analytics & reporting",
+        "Dedicated success manager",
+        "SLA guarantee",
+        "On-premise available",
+        "Custom integrations"
+      ],
+      cta: "Contact Sales",
+      popular: false
+    }
+  ]
+
+  const testimonials = [
+    {
+      quote: "ZeroFalse caught an SQL injection that looked exactly like a parameterized query. Our senior engineer missed it. ZeroFalse didn't.",
+      author: "Sarah Chen",
+      role: "CTO",
+      company: "TechCorp",
+      image: "/api/placeholder/48/48"
+    },
+    {
+      quote: "The model fingerprinting feature alone saved us from three potential breaches in our first month.",
+      author: "Michael Rodriguez",
+      role: "Head of Engineering",
+      company: "DataFlow",
+      image: "/api/placeholder/48/48"
+    }
+  ]
+
   return (
-    <main className="min-h-screen bg-black text-white overflow-x-hidden">
+    <div className="min-h-screen bg-navy-950">
       <Navbar />
       
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-green-900/20 via-black to-black" />
+      <section className="relative pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden">
+        <div className="absolute inset-0 bg-grid opacity-50" />
+        <div className="absolute inset-0 bg-gradient-to-b from-navy-950 via-transparent to-navy-950" />
         
-        <div className="relative max-w-7xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8 animate-fade-in">
-            <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-sm text-gray-300">Built for the Post-Coding Era</span>
-          </div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div 
+            className="text-center max-w-4xl mx-auto"
+            initial="initial"
+            animate="animate"
+            variants={staggerContainer}
+          >
+            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-cyan-400 text-sm font-medium mb-8">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-400"></span>
+              </span>
+              Now supporting GPT-5, Claude 4, and Copilot X
+            </motion.div>
 
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-6 animate-slide-up">
-            The Intent Firewall for
-            <br />
-            <span className="gradient-text">AI-Native Software</span>
-          </h1>
-
-          <p className="max-w-2xl mx-auto text-xl text-gray-400 mb-8 animate-slide-up delay-100">
-            AI agents write code that looks correct. <strong className="text-white">45% of it has dangerous vulnerabilities.</strong>
-            <br />
-            Zerofalse finds the 10% that looks right but kills you in production.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12 animate-slide-up delay-200">
-            <a
-              href="#install"
-              className="group flex items-center gap-2 px-8 py-4 bg-green-500 hover:bg-green-600 text-black font-semibold rounded-lg transition-all hover:scale-105"
+            <motion.h1 
+              variants={fadeInUp}
+              className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-6"
             >
-              <span>🚀</span>
-              Start Free — Install GitHub App
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </a>
-            <a
-              href="#demo"
-              className="flex items-center gap-2 px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg transition-all border border-white/10"
+              The Intent Firewall for{' '}
+              <span className="text-gradient">AI-Native</span> Development
+            </motion.h1>
+
+            <motion.p 
+              variants={fadeInUp}
+              className="text-xl text-navy-300 mb-8 max-w-2xl mx-auto leading-relaxed"
             >
-              <span>📊</span>
-              See Live Demo
-            </a>
-          </div>
+              AI agents write code that looks correct. <span className="text-white font-semibold">45% of it has dangerous vulnerabilities.</span> 
+              ZeroFalse finds the threats that look right but kill you in production.
+            </motion.p>
 
-          <div className="flex items-center justify-center gap-8 text-sm text-gray-500 mb-16 animate-fade-in delay-300">
-            <span className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-green-500" />
-              No credit card required
-            </span>
-            <span className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-green-500" />
-              Free for 14 days
-            </span>
-            <span className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-green-500" />
-              Setup in 2 minutes
-            </span>
-          </div>
+            <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+              <button className="inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-navy-950 bg-cyan-400 rounded-lg hover:bg-cyan-300 transition-all duration-200 hover:shadow-lg hover:shadow-cyan-400/25 group">
+                Start Free Trial
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </button>
+              <button className="inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-white glass rounded-lg hover:bg-white/10 transition-all duration-200 group">
+                <Play className="mr-2 h-5 w-5" />
+                Watch Demo
+              </button>
+            </motion.div>
 
-          <CodePreview />
+            <motion.div variants={fadeInUp} className="flex items-center justify-center gap-8 text-navy-400 text-sm">
+              <span className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-cyan-400" />
+                No credit card required
+              </span>
+              <span className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-cyan-400" />
+                14-day free trial
+              </span>
+              <span className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-cyan-400" />
+                Setup in 2 minutes
+              </span>
+            </motion.div>
+          </motion.div>
+
+          {/* Dashboard Preview */}
+          <motion.div 
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.7 }}
+            className="mt-20 relative"
+          >
+            <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-2xl blur opacity-30" />
+            <div className="relative glass-strong rounded-2xl p-2">
+              <div className="bg-navy-950 rounded-xl overflow-hidden">
+                <div className="flex items-center gap-2 px-4 py-3 border-b border-navy-800">
+                  <div className="flex gap-2">
+                    <div className="w-3 h-3 rounded-full bg-danger" />
+                    <div className="w-3 h-3 rounded-full bg-warning" />
+                    <div className="w-3 h-3 rounded-full bg-success" />
+                  </div>
+                  <div className="flex-1 text-center text-sm text-navy-400 font-mono">
+                    ZeroFalse Dashboard
+                  </div>
+                </div>
+                <div className="p-6 grid grid-cols-3 gap-6">
+                  <div className="col-span-2 space-y-4">
+                    <div className="flex gap-4">
+                      <div className="flex-1 glass rounded-lg p-4">
+                        <div className="text-navy-400 text-sm mb-1">Security Score</div>
+                        <div className="text-3xl font-bold text-white">94<span className="text-cyan-400">/100</span></div>
+                        <div className="text-success text-sm mt-1">↑ +3pts this week</div>
+                      </div>
+                      <div className="flex-1 glass rounded-lg p-4">
+                        <div className="text-navy-400 text-sm mb-1">Threats Blocked</div>
+                        <div className="text-3xl font-bold text-white">1,247</div>
+                        <div className="text-success text-sm mt-1">↑ 12% from last month</div>
+                      </div>
+                    </div>
+                    <div className="glass rounded-lg p-4 h-48 flex items-end justify-between gap-2">
+                      {[40, 65, 45, 80, 55, 90, 85, 70, 95, 88, 92, 94].map((h, i) => (
+                        <div key={i} className="flex-1 bg-cyan-500/20 rounded-t-sm relative group">
+                          <div 
+                            className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-cyan-600 to-cyan-400 rounded-t-sm transition-all duration-500"
+                            style={{ height: `${h}%` }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="glass rounded-lg p-4">
+                      <div className="text-navy-400 text-sm mb-3">Active Sessions</div>
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
+                          <div className="flex-1">
+                            <div className="text-white text-sm font-medium">Claude Code</div>
+                            <div className="text-navy-400 text-xs">45 min • 234 lines</div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
+                          <div className="flex-1">
+                            <div className="text-white text-sm font-medium">Cursor IDE</div>
+                            <div className="text-navy-400 text-xs">12 min • 89 lines</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="glass rounded-lg p-4">
+                      <div className="text-navy-400 text-sm mb-3">Recent Threats</div>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-xs">
+                          <span className="px-2 py-1 rounded bg-danger/20 text-danger">Critical</span>
+                          <span className="text-navy-300">SQL Injection</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs">
+                          <span className="px-2 py-1 rounded bg-warning/20 text-warning">High</span>
+                          <span className="text-navy-300">Hardcoded Secret</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Problem Section */}
-      <section id="problem" className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-900/30">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <span className="text-green-400 font-semibold tracking-wide uppercase text-sm">The Problem</span>
-            <h2 className="mt-2 text-4xl font-bold text-white">AI Codes. Humans Can't Verify.</h2>
-            <p className="mt-4 text-xl text-gray-400">We're in Stage 3. Security review is breaking down.</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 mb-16">
-            <div className="p-6 rounded-2xl bg-gray-800/50 border border-white/5">
-              <div className="text-sm text-gray-500 mb-2">2024</div>
-              <h3 className="text-xl font-bold text-white mb-2">Stage 1: AI Assists</h3>
-              <p className="text-gray-400 mb-4">AI helps humans write code</p>
-              <div className="flex items-center gap-2 text-green-400">
-                <CheckCircle className="w-4 h-4" />
-                <span className="text-sm">Security: Works</span>
-              </div>
-            </div>
-            <div className="p-6 rounded-2xl bg-gray-800/50 border border-white/5">
-              <div className="text-sm text-gray-500 mb-2">2025</div>
-              <h3 className="text-xl font-bold text-white mb-2">Stage 2: AI Writes</h3>
-              <p className="text-gray-400 mb-4">AI generates complete code</p>
-              <div className="flex items-center gap-2 text-yellow-400">
-                <AlertTriangle className="w-4 h-4" />
-                <span className="text-sm">Security: Breaks</span>
-              </div>
-            </div>
-            <div className="p-6 rounded-2xl bg-green-500/10 border border-green-500/30 relative overflow-hidden">
-              <div className="absolute top-0 right-0 bg-green-500 text-black text-xs font-bold px-3 py-1 rounded-bl-lg">NOW</div>
-              <div className="text-sm text-green-400 mb-2">2026</div>
-              <h3 className="text-xl font-bold text-white mb-2">Stage 3: AI Agents</h3>
-              <p className="text-gray-400 mb-4">AI agents work autonomously</p>
-              <div className="flex items-center gap-2 text-red-400">
-                <XCircle className="w-4 h-4" />
-                <span className="text-sm">Security: Fails</span>
-              </div>
-            </div>
-          </div>
-
+      {/* Stats Section */}
+      <section className="py-20 border-y border-navy-800/50 bg-navy-900/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center p-6">
-              <div className="text-5xl font-bold text-white mb-2">
-                <StatsCounter end={45} suffix="%" />
-              </div>
-              <div className="text-gray-400">of AI code has security flaws</div>
-              <div className="text-sm text-gray-600 mt-1">Veracode 2025</div>
-            </div>
-            <div className="text-center p-6">
-              <div className="text-5xl font-bold text-white mb-2">1 in 5</div>
-              <div className="text-gray-400">orgs breached by AI code</div>
-              <div className="text-sm text-gray-600 mt-1">Aikido 2026</div>
-            </div>
-            <div className="text-center p-6">
-              <div className="text-5xl font-bold text-white mb-2">
-                <StatsCounter end={274} suffix="%" />
-              </div>
-              <div className="text-gray-400">more vulnerabilities vs human code</div>
-              <div className="text-sm text-gray-600 mt-1">Security Research</div>
-            </div>
+            {stats.map((stat, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="text-center"
+              >
+                <div className="text-4xl sm:text-5xl font-bold text-white mb-2">{stat.value}</div>
+                <div className="text-navy-300 mb-1">{stat.label}</div>
+                <div className="text-navy-500 text-sm">{stat.source}</div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section id="how-it-works" className="py-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+      <section className="py-24 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <span className="text-green-400 font-semibold tracking-wide uppercase text-sm">How It Works</span>
-            <h2 className="mt-2 text-4xl font-bold text-white">The Only Security Agent That Joins Your AI Team</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">How It Works</h2>
+            <p className="text-navy-400 text-lg max-w-2xl mx-auto">
+              The only security agent that joins your AI team, not fights against it.
+            </p>
           </div>
 
-          {features.map((feature, index) => (
-            <FeatureCard key={index} {...feature} />
-          ))}
+          <div className="grid md:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="group relative"
+              >
+                <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-500" />
+                <div className="relative glass rounded-2xl p-8 h-full hover-lift">
+                  <div className="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <feature.icon className="h-6 w-6 text-cyan-400" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-3">{feature.title}</h3>
+                  <p className="text-navy-400 mb-6 leading-relaxed">{feature.description}</p>
+                  <ul className="space-y-3">
+                    {feature.highlights.map((highlight, i) => (
+                      <li key={i} className="flex items-start gap-3 text-sm text-navy-300">
+                        <CheckCircle2 className="h-4 w-4 text-cyan-400 mt-0.5 shrink-0" />
+                        {highlight}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Dashboard Preview Section */}
-      <section id="demo" className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-900/30">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <span className="text-green-400 font-semibold tracking-wide uppercase text-sm">Dashboard</span>
-            <h2 className="mt-2 text-4xl font-bold text-white">Visibility Into AI Code Across Your Organization</h2>
-          </div>
-
-          <div className="rounded-2xl overflow-hidden border border-white/10 bg-gray-900/50 backdrop-blur-sm">
-            <div className="flex items-center gap-4 px-6 py-4 border-b border-white/10 bg-gray-800/50">
-              <div className="flex gap-2">
-                <div className="w-3 h-3 rounded-full bg-red-500" />
-                <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                <div className="w-3 h-3 rounded-full bg-green-500" />
-              </div>
-              <div className="flex gap-6 text-sm">
-                <span className="text-white font-medium border-b-2 border-green-500 pb-4 -mb-4">Overview</span>
-                <span className="text-gray-500 hover:text-gray-300 cursor-pointer">Live Sessions</span>
-                <span className="text-gray-500 hover:text-gray-300 cursor-pointer">Provenance</span>
-                <span className="text-gray-500 hover:text-gray-300 cursor-pointer">Threats</span>
-              </div>
-            </div>
-            
-            <div className="p-8">
-              <div className="grid md:grid-cols-3 gap-6 mb-8">
-                <div className="p-6 rounded-xl bg-gray-800/50 border border-white/5">
-                  <div className="text-sm text-gray-400 mb-1">Security Score</div>
-                  <div className="text-3xl font-bold text-white mb-2">94/100</div>
-                  <div className="text-sm text-green-400">↑ +3pts this week</div>
+      {/* Code Comparison Section */}
+      <section className="py-24 bg-navy-900/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
+                Catches What Others Miss
+              </h2>
+              <p className="text-navy-400 text-lg mb-8 leading-relaxed">
+                Traditional SAST tools look for patterns. We understand intent. 
+                See how ZeroFalse catches the SQL injection that looks perfectly safe.
+              </p>
+              <div className="space-y-4">
+                <div className="flex items-start gap-4">
+                  <div className="w-8 h-8 rounded-full bg-danger/20 flex items-center justify-center shrink-0">
+                    <X className="h-4 w-4 text-danger" />
+                  </div>
+                  <div>
+                    <div className="text-white font-medium mb-1">What AI Wrote</div>
+                    <div className="text-navy-400 text-sm">Looks like parameterized query, but uses template literal</div>
+                  </div>
                 </div>
-                <div className="p-6 rounded-xl bg-gray-800/50 border border-white/5">
-                  <div className="text-sm text-gray-400 mb-1">Code Today</div>
-                  <div className="text-3xl font-bold text-white mb-2">2,847</div>
-                  <div className="text-sm text-green-400">↑ 23% from yesterday</div>
-                </div>
-                <div className="p-6 rounded-xl bg-gray-800/50 border border-white/5">
-                  <div className="text-sm text-gray-400 mb-1">Active Sessions</div>
-                  <div className="text-3xl font-bold text-white mb-2">2</div>
-                  <div className="flex items-center gap-2 text-sm text-green-400">
-                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                    Healthy
+                <div className="flex items-start gap-4">
+                  <div className="w-8 h-8 rounded-full bg-success/20 flex items-center justify-center shrink-0">
+                    <CheckCircle2 className="h-4 w-4 text-success" />
+                  </div>
+                  <div>
+                    <div className="text-white font-medium mb-1">ZeroFalse Detection</div>
+                    <div className="text-navy-400 text-sm">Identifies string interpolation vulnerability in SQL context</div>
                   </div>
                 </div>
               </div>
-
-              <div className="h-64 flex items-end justify-between gap-2 px-4">
-                {[40, 60, 80, 70, 90, 95, 94].map((height, i) => (
-                  <div key={i} className="flex-1 flex flex-col items-center gap-2">
-                    <div
-                      className={`w-full rounded-t-lg transition-all duration-500 ${
-                        i === 6 ? "bg-green-500" : "bg-gray-700"
-                      }`}
-                      style={{ height: `${height}%` }}
-                    />
-                    <span className="text-xs text-gray-500">
-                      {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][i]}
-                    </span>
+            </div>
+            <div className="relative">
+              <div className="absolute -inset-1 bg-gradient-to-r from-danger/50 to-warning/50 rounded-2xl blur opacity-30" />
+              <div className="relative code-block">
+                <div className="flex items-center gap-2 mb-4 text-navy-400 text-sm">
+                  <div className="w-3 h-3 rounded-full bg-danger" />
+                  <span>vulnerable.js</span>
+                </div>
+                <pre className="text-sm overflow-x-auto">
+                  <code className="text-navy-300">
+                    <span className="text-purple-400">const</span> <span className="text-cyan-400">query</span> = <span className="text-warning">`SELECT * FROM users WHERE id = {'${'}id{'}'}`</span>;{'\n'}
+                    <span className="text-navy-500">// Looks parameterized, but it's not!</span>{'\n'}
+                    {'\n'}
+                    <span className="text-navy-500">// ZeroFalse catches this because:</span>{'\n'}
+                    <span className="text-navy-500">// 1. Template literal in SQL context</span>{'\n'}
+                    <span className="text-navy-500">// 2. Variable interpolation detected</span>{'\n'}
+                    <span className="text-navy-500">// 3. No actual parameterization used</span>
+                  </code>
+                </pre>
+                <div className="mt-4 p-3 bg-danger/10 border border-danger/30 rounded-lg">
+                  <div className="flex items-center gap-2 text-danger text-sm font-medium">
+                    <Shield className="h-4 w-4" />
+                    Critical: SQL Injection Vulnerability
                   </div>
-                ))}
+                </div>
               </div>
             </div>
           </div>
+        </div>
+      </section>
 
-          <div className="text-center mt-8">
-            <a
-              href="/dashboard"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-medium rounded-lg transition-colors border border-white/10"
-            >
-              Explore Dashboard Features
-              <ArrowRight className="w-4 h-4" />
-            </a>
+      {/* Testimonials */}
+      <section className="py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white text-center mb-16">Trusted by Security Teams</h2>
+          <div className="grid md:grid-cols-2 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="glass rounded-2xl p-8 relative"
+              >
+                <div className="text-cyan-400 text-4xl font-serif mb-4">"</div>
+                <p className="text-navy-200 text-lg mb-6 leading-relaxed">{testimonial.quote}</p>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600" />
+                  <div>
+                    <div className="text-white font-semibold">{testimonial.author}</div>
+                    <div className="text-navy-400 text-sm">{testimonial.role}, {testimonial.company}</div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Social Proof Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto text-center mb-16">
-          <blockquote className="text-2xl sm:text-3xl font-medium text-white italic mb-6">
-            "Zerofalse caught an SQL injection that looked exactly like a parameterized query. Our senior engineer missed it. Zerofalse didn't."
-          </blockquote>
-          <cite className="text-gray-400 not-italic">— CTO, Series A Startup</cite>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-          <div className="text-center p-6 rounded-2xl bg-gray-800/30 border border-white/5">
-            <div className="text-4xl font-bold text-green-400 mb-2">
-              <StatsCounter end={127} />
-            </div>
-            <div className="text-gray-400">Threats Blocked</div>
-            <div className="text-sm text-gray-600">this month</div>
-          </div>
-          <div className="text-center p-6 rounded-2xl bg-gray-800/30 border border-white/5">
-            <div className="text-4xl font-bold text-yellow-400 mb-2">
-              <StatsCounter end={34} />
-            </div>
-            <div className="text-gray-400">"Looks Clean"</div>
-            <div className="text-sm text-gray-600">caught</div>
-          </div>
-          <div className="text-center p-6 rounded-2xl bg-gray-800/30 border border-white/5">
-            <div className="text-4xl font-bold text-red-400 mb-2">
-              <StatsCounter end={23} />
-            </div>
-            <div className="text-gray-400">Hallucinated Packages</div>
-            <div className="text-sm text-gray-600">blocked</div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing Section */}
-      <section id="pricing" className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-900/30">
-        <div className="max-w-7xl mx-auto">
+{/* Pricing Section */}
+      <section className="py-24 bg-navy-900/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <span className="text-green-400 font-semibold tracking-wide uppercase text-sm">Pricing</span>
-            <h2 className="mt-2 text-4xl font-bold text-white">Simple Pricing</h2>
-            <p className="mt-4 text-xl text-gray-400">Start free. Scale as your AI coding scales.</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Simple Pricing</h2>
+            <p className="text-navy-400 text-lg">Start free. Scale as your AI coding scales.</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {pricingPlans.map((plan) => (
-              <PricingCard key={plan.name} {...plan} />
+            {pricingPlans.map((plan, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className={`relative rounded-2xl ${plan.popular ? 'bg-gradient-to-b from-cyan-500/20 to-navy-900 border-2 border-cyan-500/50' : 'glass'}`}
+              >
+                {plan.popular && (
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                    <span className="bg-cyan-500 text-navy-950 text-xs font-bold px-4 py-1 rounded-full">
+                      MOST POPULAR
+                    </span>
+                  </div>
+                )}
+                <div className="p-8">
+                  <h3 className="text-xl font-semibold text-white mb-2">{plan.name}</h3>
+                  <div className="flex items-baseline gap-1 mb-4">
+                    <span className="text-4xl font-bold text-white">{plan.price}</span>
+                    <span className="text-navy-400">{plan.period}</span>
+                  </div>
+                  <p className="text-navy-400 text-sm mb-6">{plan.description}</p>
+                  <button className={`w-full py-3 rounded-lg font-semibold transition-all duration-200 ${plan.popular ? 'bg-cyan-400 text-navy-950 hover:bg-cyan-300' : 'glass text-white hover:bg-white/10'}`}>
+                    {plan.cta}
+                  </button>
+                  <ul className="mt-8 space-y-4">
+                    {plan.features.map((feature, i) => (
+                      <li key={i} className="flex items-start gap-3 text-sm text-navy-300">
+                        <CheckCircle2 className="h-4 w-4 text-cyan-400 mt-0.5 shrink-0" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </motion.div>
             ))}
           </div>
 
-          <div className="text-center mt-12 text-gray-400">
-            <p className="flex items-center justify-center gap-6">
-              <span className="flex items-center gap-2">
-                <span className="text-green-400">🎓</span>
-                Free for open source
-              </span>
-              <span className="flex items-center gap-2">
-                <span className="text-green-400">💳</span>
-                No credit card to start
-              </span>
+          <div className="mt-12 text-center">
+            <p className="text-navy-400">
+              Open source maintainers: <span className="text-cyan-400">Free unlimited scanning</span> for public repositories
             </p>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section id="install" className="py-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
+{/* CTA Section */}
+      <section className="py-24 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-blue-600/10" />
+        <div className="absolute inset-0 bg-grid opacity-30" />
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
             AI Agents Are Writing Code Right Now.
             <br />
-            <span className="gradient-text">Are You Verifying What They're Building?</span>
+            <span className="text-gradient">Are You Verifying It?</span>
           </h2>
-          <p className="text-xl text-gray-400 mb-8">
-            Join 50+ teams using Zerofalse to secure their AI-native software.
+          <p className="text-navy-400 text-lg mb-8">
+            Join 500+ teams using ZeroFalse to secure their AI-native software.
           </p>
-          
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
-            <a
-              href="#"
-              className="flex items-center gap-2 px-8 py-4 bg-green-500 hover:bg-green-600 text-black font-semibold rounded-lg transition-all hover:scale-105"
-            >
-              <span>🚀</span>
-              Start Free — Install GitHub App
-            </a>
-            <a
-              href="#"
-              className="flex items-center gap-2 px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg transition-all border border-white/10"
-            >
-              Schedule a Demo
-            </a>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button className="inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-navy-950 bg-cyan-400 rounded-lg hover:bg-cyan-300 transition-all duration-200 hover:shadow-lg hover:shadow-cyan-400/25">
+              Start Free Trial
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </button>
+            <button className="inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-white glass rounded-lg hover:bg-white/10 transition-all duration-200">
+              Talk to Sales
+            </button>
           </div>
-
-          <div className="flex items-center justify-center gap-6 text-sm text-gray-500">
+          <div className="mt-8 flex items-center justify-center gap-6 text-navy-400 text-sm">
             <span className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-green-500" />
-              Free 14-day trial
+              <CheckCircle2 className="h-4 w-4 text-cyan-400" />
+              14-day trial
             </span>
             <span className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-green-500" />
+              <CheckCircle2 className="h-4 w-4 text-cyan-400" />
               No credit card
             </span>
             <span className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-green-500" />
-              Setup in 2 min
+              <CheckCircle2 className="h-4 w-4 text-cyan-400" />
+              Cancel anytime
             </span>
           </div>
         </div>
       </section>
 
       <Footer />
-    </main>
-  );
+    </div>
+  )
 }
