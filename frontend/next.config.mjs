@@ -1,16 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // This is the key part that lets your build finish even 
-  // if the "Linting" robot finds minor issues.
-  eslint: {
-    ignoreDuringBuilds: true,
+  output: 'export',
+  distDir: 'dist',
+  images: {
+    unoptimized: true,
   },
-  
-  // This ensures your build ignores type errors if you add 
-  // TypeScript later, keeping your deployment fast.
-  typescript: {
-    ignoreBuildErrors: true,
-  },
+  trailingSlash: true,
 };
 
 export default nextConfig;
