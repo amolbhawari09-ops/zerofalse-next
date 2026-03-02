@@ -61,8 +61,8 @@ const features = [
             <span className="text-xs font-medium text-red-400">Looks Clean</span>
           </div>
           <code className="text-sm text-red-300">
-            const query = `SELECT * FROM users WHERE id = ${id}`
-          </code>
+  {`const query = \`SELECT * FROM users WHERE id = \${id}\``}
+</code>
         </div>
         <div className="flex justify-center">
           <ArrowRight className="w-6 h-6 text-gray-600 rotate-90" />
@@ -73,8 +73,8 @@ const features = [
             <span className="text-xs font-medium text-green-400">Actually Safe</span>
           </div>
           <code className="text-sm text-green-300">
-            db.query('SELECT * FROM users WHERE id = ?', [id])
-          </code>
+  {`db.query('SELECT * FROM users WHERE id = ?', [id])`}
+</code>
         </div>
       </div>
     ),
