@@ -6,18 +6,18 @@ export function cn(...inputs) {
 }
 
 export function formatNumber(num) {
-  if (num >= 1000000) {
-    return (num / 1000000).toFixed(1) + 'M'
-  }
-  if (num >= 1000) {
-    return (num / 1000).toFixed(1) + 'K'
-  }
-  return num.toString()
+  return new Intl.NumberFormat('en-US', {
+    notation: "compact",
+    maximumFractionDigits: 1
+  }).format(num)
 }
 
 export function formatRelativeTime(date) {
+  const dateObj = new Date(date)
+  if (isNaN(dateObj.getTime())) return 'Invalid date'
+
   const now = new Date()
-  const diff = now - new Date(date)
+  const diff = now - dateObj
   const minutes = Math.floor(diff / 60000)
   const hours = Math.floor(diff / 3600000)
   const days = Math.floor(diff / 86400000)
@@ -26,10 +26,12 @@ export function formatRelativeTime(date) {
   if (minutes < 60) return `${minutes}m ago`
   if (hours < 24) return `${hours}h ago`
   if (days < 7) return `${days}d ago`
-  return new Date(date).toLocaleDateString()
+  
+  return dateObj.toLocaleDateString()
 }
 
 export function getSeverityColor(severity) {
+  // Ensure these keys match your tailwind.config.js colors
   const colors = {
     Critical: 'text-danger bg-danger/20 border-danger/30',
     High: 'text-warning bg-warning/20 border-warning/30',
