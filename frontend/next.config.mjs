@@ -1,9 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  
-  // Note: swcMinify is removed (enabled by default in v15+)
-  
+
   images: {
     remotePatterns: [
       {
@@ -12,13 +10,12 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: '**', // Broad wildcard for AI-generated images/external sources
+        hostname: '**',
       },
     ],
   },
 
   experimental: {
-    // Keeps build times fast by only processing what's needed
     optimizePackageImports: ['lucide-react', 'recharts', 'framer-motion'],
   },
 
@@ -32,11 +29,13 @@ const nextConfig = {
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'X-Frame-Options', value: 'DENY' },
           { key: 'X-XSS-Protection', value: '1; mode=block' },
-          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' }
-        ]
-      }
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+        ],
+      },
     ];
-  }
+  },
 };
 
-export default nextConfig;
+// FIX: Changed from "export default" (ESM) to "module.exports" (CommonJS)
+// next.config.js must use CommonJS unless the file is named next.config.mjs
+module.exports = nextConfig;
