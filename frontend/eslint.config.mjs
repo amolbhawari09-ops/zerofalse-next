@@ -10,18 +10,12 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
-  // This correctly loads the Next.js core-web-vitals config
-  ...compat.extends("next/core-web-vitals"),
-  
-  // Custom global ignores replace your 'globalIgnores' block
+  // 1. Tell ESLint to ignore these folders
   {
-    ignores: [
-      ".next/**",
-      "out/**",
-      "build/**",
-      "next-env.d.ts",
-    ],
+    ignores: [".next/**", "out/**", "build/**", "next-env.d.ts"],
   },
+  // 2. Load the Next.js rules using the "translator"
+  ...compat.extends("next/core-web-vitals"),
 ];
 
 export default eslintConfig;
